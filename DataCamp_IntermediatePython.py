@@ -103,3 +103,59 @@ def concat(**kwargs):
     return result
 
 print(concat(start="Python", middle="is", end="great!"))
+
+#Lambda Functions
+print("\n*****Lambda Functions*****")
+#Lambda functions are anonymous functions defined using the lambda keyword. 
+#They can take any number of arguments but can only have one expression. The expression is evaluated and returned when the function is called.
+#Lambda functions are often used for short, simple operations that can be defined in a single line
+#Lambda VS Custom Functions.
+#For complex tasks and same task repeated multiple times, custom functions are better.
+#For performed once and simple tasks, lambda functions are better.
+
+file_size = 2500
+extra_space = 0.15
+
+# Define a lambda function
+calculate_total = lambda x: x * (1 + extra_space)
+
+# Call the lambda function
+print(calculate_total(file_size))
+
+# Call a lambda function in one line
+print((lambda x: x * (1 + extra_space))(file_size))
+
+###################################################################
+colleagues = ["Sarah Martinez", "Michael Chen", "Emily Brown"]
+
+# Apply the lambda function to each colleague's name
+# Map function applies the lambda function to each element in the colleagues list and returns a map object.
+# Basically, do this fuction with every element in the list and return a new list with the results.
+cleaned = map(lambda x: x.replace(" ", "_").lower(), colleagues)
+
+# Convert map object to list
+cleaned_list = list(cleaned)
+print(cleaned_list)
+
+#Error Handling
+print("\n*****Error Handling*****")
+
+def clean_text(text):
+  # Attempt to clean the text
+  try:
+    return text.replace(" ", "_").lower()
+  # Run this code if an error occurs
+  except:
+    print("The clean_text() function expects a string as an argument, please check the data type provided!")
+    
+clean_text(187)
+
+def clean_text1(text):
+  # Check the data type
+  if type(text) == str:
+    return text.replace(" ", "_").lower()
+  else:
+    # Return a TypeError error if the wrong data type was used
+    raise TypeError("The clean_text() function expects a string as an argument, please check the data type provided!")
+    
+clean_text1("User Name 187")
