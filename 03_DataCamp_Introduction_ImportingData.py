@@ -129,8 +129,9 @@ print(df2.head())
 # Skiprows -> Skip the first row of the sheet, always with a list.
 # Names -> Rename the columns of the DataFrame, always with a list.
 # Usecols -> Load only the first column of the sheet into a DataFrame, always with a list.
+# Parse_cols -> Load only the first column of the sheet into a DataFrame, always with a list.
 df1 = xls.parse(0, skiprows=[0], names=['Country','AAM due to War (2002)'])
-df2 = xls.parse(1, usecols=[0], skiprows=[0], names=['Country'])
+df2 = xls.parse(1, usecols=[0], skiprows=[0], names=['Country'], parse_cols=[0])
 
 print(df1.head())
 print(df2.head())
