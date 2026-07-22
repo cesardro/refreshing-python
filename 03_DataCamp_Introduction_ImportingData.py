@@ -87,3 +87,101 @@ pd.DataFrame.hist(data[['Age']])
 plt.xlabel('Age (years)')
 plt.ylabel('count')
 plt.show()
+
+#Pickle files
+print("\n*****Pickle File*****")
+# Pickle files are a way to store python objects in a file. They are used to save and load data in Python.
+import pickle
+
+# Load the pickled data: d, rb -> read binary
+with open('data.pkl', 'rb') as file:
+    d = pickle.load(file)
+
+print(d)
+print(type(d))
+
+####################################
+file = 'battledeath.xlsx'
+# Load spreadsheet: xls
+xls = pd.ExcelFile(file)
+
+print(xls.sheet_names)
+####################################
+xls = pd.ExcelFile('sales.xlsx')
+print(xls.sheet_names)
+# ['2003', '2004', '2005']
+df1 = xls.parse('2004')
+####################################
+# Same as above, but now we use the sheet index instead of the name.
+df1 = pd.read_excel('sales.xlsx', sheet_name='2004')
+####################################
+# Load a sheet into a DataFrame by name.
+df1 = xls.parse('2004')
+
+# Load a sheet into a DataFrame by index.
+df2 = xls.parse(0)
+
+print(df1.head())
+print(df2.head())
+#####################################
+# Parse -> Load a specific sheet of an Excel file into a DataFrame.
+# First argument is the sheet name or index, and the second argument is a list of options to customize the loading process.
+# Skiprows -> Skip the first row of the sheet, always with a list.
+# Names -> Rename the columns of the DataFrame, always with a list.
+# Usecols -> Load only the first column of the sheet into a DataFrame, always with a list.
+df1 = xls.parse(0, skiprows=[0], names=['Country','AAM due to War (2002)'])
+df2 = xls.parse(1, usecols=[0], skiprows=[0], names=['Country'])
+
+print(df1.head())
+print(df2.head())
+
+# SAS and Stata files
+print("\n*****SAS and Stata Files*****")
+# SAS -> Statistical Analysis System.
+# Stata -> Statistical + Data Analysis.
+# SAS: Business Analytics and biostatistics.
+# Stata: Academic social science and research.
+# SAS is used for -> Advanced analytics, multivariate analysis, business intelligence, data management, predictive analytics and standard for computational statistics.
+
+from sas7bdat import SAS7BDAT
+
+# to_data_frame() -> Convert the SAS dataset to a pandas DataFrame.
+with SAS7BDAT('sales.sas7bdat') as file:
+    df_sas = file.to_data_frame()
+
+print(df_sas.head())
+
+# read_stata() -> Read a Stata file into a pandas DataFrame.
+df = pd.read_stata('disarea.dta')
+
+print(df.head())
+
+# HDF5 files
+print("\n*****HDF5 Files*****")
+# HDF5 -> Hierarchical Data Format version 5.
+# Standard for soring large quantities of numerical data.
+# Datasets can be hundreds of gigabytes in size, and can be organized in a hierarchical structure.
+# HDF5 files are used in -> High performance computing, scientific computing, and data analysis
+
+import h5py
+
+file = 'LIGO_data.hdf5'
+data = h5py.File(file, 'r')
+
+print(type(data))
+
+# data.keys() -> List the names of the datasets in the file.
+for key in data.keys():
+    print(key)
+
+#Matlab files
+print("\n*****Matlab Files*****")
+# MATLAB -> Matrix Laboratory.
+# Standard in engineering and scientific computing.
+import scipy.io
+
+# Load MATLAB file: mat
+mat = scipy.io.loadmat('albeck_gene_expression.mat')
+
+# Print the datatype type of mat
+print(type(mat)) # <class 'dict'>
