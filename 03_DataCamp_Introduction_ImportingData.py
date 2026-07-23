@@ -186,3 +186,74 @@ mat = scipy.io.loadmat('albeck_gene_expression.mat')
 
 # Print the datatype type of mat
 print(type(mat)) # <class 'dict'>
+
+#Relational databases.
+print("\n*****Relational Databases*****")
+from sqlalchemy import create_engine
+#Create an engine to connect to the database
+engine = create_engine('sqlite:///Chinook.sqlite')
+table_names = engine.table_names()
+print(table_names) # ['Album', 'Artist', 'Customer', 'Employee', 'Genre', 'Invoice', 'InvoiceLine', 'MediaType', 'Playlist', 'PlaylistTrack', 'Track']
+######################################
+# Connect to the database and execute a query to select all records from the album table.
+con = engine.connect()
+# Execute the query and store the result in a variable.
+rs = con.execute('select * from album')
+# Fetch all the records and store them in a DataFrame.
+df = pd.DataFrame(rs.fetchall())
+# Close the connection to the database.
+con.close()
+# Print the head of the DataFrame
+print(df.head())
+""""
+       0                                      1  2
+    0  1  For Those About To Rock We Salute You  1
+    1  2                      Balls to the Wall  2
+    2  3                      Restless and Wild  2
+    3  4                      Let There Be Rock  1
+    4  5                               Big Ones  3
+"""
+######################################
+# Connect to the database and execute a query to select the last name and title of all employees.
+with engine.connect() as con:
+    rs = con.execute('select lastname, title from employee')
+    # Fetch the first 3 records and store them in a DataFrame.
+    df = pd.DataFrame(rs.fetchmany(3))
+    # Rename the columns of the DataFrame to match the names of the columns in the database.
+    df.columns = rs.keys()
+
+print(len(df))
+print(df.head())
+"""
+    3
+      LastName                Title
+    0    Adams      General Manager
+    1  Edwards        Sales Manager
+    2  Peacock  Sales Support Agent
+"""
+######################################
+# Connect to the database and execute a query to select all records from the album table using pandas read_sql_query() function.
+df = pd.read_sql_query('select * from album', engine)
+
+# Print head of DataFrame
+print(df.head())
+######################################
+# Open engine in context manager and store query result in df1
+with engine.connect() as con:
+    rs = con.execute("SELECT * FROM Album")
+    df1 = pd.DataFrame(rs.fetchall())
+    df1.columns = rs.keys()
+
+print(df.equals(df1))
+######################################
+# Connect to the database and execute a query to select all records from the employee table where the employeeid is greater than or equal to 6 and order the results by birthdate.
+df = pd.read_sql_query('select * from employee where employeeid >= 6 order by birthdate', engine)
+
+print(df.head())
+######################################
+with engine.connect() as con:
+    rs = con.execute('select title, name from album inner join artist on album.artistid = artist.artistid')
+    df = pd.DataFrame(rs.fetchall())
+    df.columns = rs.keys()
+
+print(df.head())
