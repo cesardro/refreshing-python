@@ -106,3 +106,56 @@ a_tags = soup.find_all('a')
 # Print the URLs to the shell.
 for link in a_tags:
     print(link.get('href'))
+
+#APIs
+print("\n*****APIs*****")
+import json
+
+'''
+# Load JSON data from a file
+with open("a_movie.json") as json_file:
+    json_data = json.load(json_file)
+
+# Print the keys of the JSON data to the shell
+for k in json_data.keys():
+    print(k + ': ', json_data[k])
+
+'''
+
+# An API is a set of functions and procedures that allow the creation of applications 
+# which access the features or data of an operating system, application, or other service.
+
+url = 'http://www.omdbapi.com?apikey=72bc447a&t=the+social+network'
+
+# Perform the HTTP GET request: r
+r = requests.get(url)
+
+# Print the text of the response.
+print(r.text)
+######################################
+# Import package
+import requests
+
+# Decode the JSON data into a dictionary: json_data
+json_data = r.json()
+
+# Print each key-value pair in json_data
+for k in json_data.keys():
+    print(k + ': ', json_data[k])
+######################################
+url = 'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles=pizza'
+
+# Always include a descriptive User-Agent (Wikipedia requires this)
+headers = {
+    "User-Agent": "Checking out the Wikipedia API"
+}
+
+# Package the request, send the request and catch the response: r
+r = requests.get(url, headers=headers)
+
+# Decode the JSON data into a dictionary: json_data
+json_data = r.json()
+
+# Print the Wikipedia page extract
+pizza_extract = json_data['query']['pages']['24768']['extract']
+print(pizza_extract)
