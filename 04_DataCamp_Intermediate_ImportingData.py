@@ -159,3 +159,48 @@ json_data = r.json()
 # Print the Wikipedia page extract
 pizza_extract = json_data['query']['pages']['24768']['extract']
 print(pizza_extract)
+
+# Twitter APIs
+print("\n*****Twitter APIs*****")
+import teewpy
+# Store credentials in relevant variables
+consumer_key = "nZ6EA0FxZ293SxGNg8g8aP0HM"
+consumer_secret = "fJGEodwe3KiKUnsYJC3VRndj7jevVvXbK2D5EiJ2nehafRgA6i"
+access_token = "1092294848-aHN7DcRP9B4VMTQIhwqOYiB14YkW92fFO8k8EPy"
+access_token_secret = "X4dHmhPfaksHcQ7SCbmZa2oYBBVSD2g8uIHXsp5CTaksx"
+
+# Create your Stream object with credentials
+stream = tweepy.Stream(consumer_key, consumer_secret, access_token, access_token_secret)
+
+# Filter your Stream variable
+stream.filter(track=["clinton", "trump", "sanders", "cruz"])
+################################
+tweets_data = []
+# Open connection to file
+tweets_file = open('tweets.txt', "r")
+
+# Read in tweets and store in list: tweets_data
+for line in tweets_file:
+    tweet = json.loads(line)
+    tweets_data.append(tweet)
+
+# Close connection to file
+tweets_file.close()
+
+# Print the keys of the first tweet dict
+print(tweets_data[0].keys())
+##################################
+# Build DataFrame of tweet texts and languages
+df = pd.DataFrame(tweets_data, columns=['text','lang'])
+
+# Print head of DataFrame
+print(df.head())
+
+'''
+                                                text lang
+0  b"RT @bpolitics: .@krollbondrating's Christoph...   en
+1  b'RT @HeidiAlpine: @dmartosko Cruz video found...   en
+2  b'Njihuni me Zonj\\xebn Trump !!! | Ekskluzive...   et
+3  b"Your an idiot she shouldn't have tried to gr...   en
+4  b'RT @AlanLohner: The anti-American D.C. elite...   en
+'''
