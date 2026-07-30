@@ -162,7 +162,7 @@ print(pizza_extract)
 
 # Twitter APIs
 print("\n*****Twitter APIs*****")
-import teewpy
+import tweepy
 # Store credentials in relevant variables
 consumer_key = "nZ6EA0FxZ293SxGNg8g8aP0HM"
 consumer_secret = "fJGEodwe3KiKUnsYJC3VRndj7jevVvXbK2D5EiJ2nehafRgA6i"
