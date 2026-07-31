@@ -160,3 +160,153 @@ duplicated_rides = ride_unique[duplicates == True]
 
 # Assert duplicates are processed
 assert duplicated_rides.shape[0] == 0
+
+# Membership Connstrain
+
+'''
+# Print categories DataFrame
+print(categories)
+
+      cleanliness           safety          satisfaction
+0           Clean          Neutral        Very satisfied
+1         Average        Very safe               Neutral
+2  Somewhat clean    Somewhat safe    Somewhat satisfied
+3  Somewhat dirty      Very unsafe  Somewhat unsatisfied
+4           Dirty  Somewhat unsafe      Very unsatisfied
+
+# Print unique values of survey columns in airlines
+print('Cleanliness: ', airlines['cleanliness'].unique(), "\n")
+
+Cleanliness:  ['Clean', 'Average', 'Unacceptable', 'Somewhat clean', 'Somewhat dirty', 'Dirty']
+Categories (6, object): ['Average', 'Clean', 'Dirty', 'Somewhat clean', 'Somewhat dirty', 'Unacceptable'] 
+
+print('Safety: ', airlines['safety'].unique(), "\n")
+Safety:  ['Neutral', 'Very safe', 'Somewhat safe', 'Very unsafe', 'Somewhat unsafe']
+Categories (5, object): ['Neutral', 'Somewhat safe', 'Somewhat unsafe', 'Very safe', 'Very unsafe'] 
+
+print('Satisfaction: ', airlines['satisfaction'].unique(), "\n")
+Satisfaction:  ['Very satisfied', 'Neutral', 'Somewhat satisfied', 'Somewhat unsatisfied', 'Very unsatisfied']
+Categories (5, object): ['Neutral', 'Somewhat satisfied', 'Somewhat unsatisfied', 'Very satisfied', 'Very unsatisfied'] 
+'''
+
+'''
+# Find the cleanliness category in airlines not in categories
+cat_clean = set(airlines['cleanliness']).difference(categories['cleanliness'])
+
+# Find rows with that category
+cat_clean_rows = airlines['cleanliness'].isin(cat_clean)
+
+# Print rows with inconsistent category
+print(airlines[cat_clean_rows])
+
+           id        day           airline  destination  dest_region dest_size boarding_area   dept_time  wait_min   cleanliness         safety        satisfaction
+    4    2992  Wednesday          AMERICAN        MIAMI      East US       Hub   Gates 50-59  2018-12-31     559.0  Unacceptable      Very safe  Somewhat satisfied
+    18   2913     Friday  TURKISH AIRLINES     ISTANBUL  Middle East       Hub  Gates 91-102  2018-12-31     225.0  Unacceptable      Very safe  Somewhat satisfied
+    100  2321  Wednesday         SOUTHWEST  LOS ANGELES      West US       Hub   Gates 20-39  2018-12-31     130.0  Unacceptable  Somewhat safe  Somewhat satisfied
+
+# Print rows with consistent categories only
+print(airlines[~cat_clean_rows])
+'''
+
+# Categorical 
+airlines = ()
+
+# Print unique values of both columns
+print(airlines['dest_region'].unique())
+print(airlines['dest_size'].unique())
+
+'''
+    ['Asia' 'Canada/Mexico' 'West US' 'East US' 'Midwest US' 'EAST US'
+     'Middle East' 'Europe' 'eur' 'Central/South America'
+     'Australia/New Zealand' 'middle east']
+    ['Hub' 'Small' '    Hub' 'Medium' 'Large' 'Hub     ' '    Small'
+     'Medium     ' '    Medium' 'Small     ' '    Large' 'Large     ']
+'''
+
+# Lower dest_region column and then replace "eur" with "europe"
+airlines['dest_region'] = airlines['dest_region'].str.lower() 
+airlines['dest_region'] = airlines['dest_region'].replace({'eur':'europe'})
+
+# Remove white spaces from `dest_size`
+airlines['dest_size'] = airlines['dest_size'].str.strip()
+
+# Verify changes have been effected
+print(airlines['dest_region'].unique())
+print(airlines['dest_size'].unique())
+
+'''
+    ['asia' 'canada/mexico' 'west us' 'east us' 'midwest us' 'middle east'
+     'europe' 'central/south america' 'australia/new zealand']
+    ['Hub' 'Small' 'Medium' 'Large']
+'''
+import numpy as np
+
+# Create ranges -> 0 -------- 60 -------- 180 -------- ∞
+label_ranges = [0, 60, 180, np.inf]
+# Create intervals.
+label_names = ['short', 'medium', 'long']
+
+# Create wait_type column
+# .cut() converts continue numeric values into categories based on intervals.
+# airlines['wait_min'] -> 45, bins -> range 0-60-180+, labels -> name of catergory
+airlines['wait_type'] = pd.cut(airlines['wait_min'], bins = label_ranges, labels = label_names)
+
+# Create mapping dictionary
+mappings = {
+    'Monday': 'weekday',
+    'Tuesday': 'weekday',
+    'Wednesday': 'weekday',
+    'Thursday': 'weekday',
+    'Friday': 'weekday',
+    'Saturday': 'weekend',
+    'Sunday': 'weekend'
+}
+
+airlines['day_week'] = airlines['day'].replace(mappings)
+
+# Clean text data. 
+
+# Replace "Dr." with empty string ""
+airlines['full_name'] = airlines['full_name'].str.replace("Dr.","")
+
+# Replace "Mr." with empty string ""
+airlines['full_name'] = airlines['full_name'].str.replace("Mr.","")
+
+# Replace "Miss" with empty string ""
+airlines['full_name'] = airlines['full_name'].str.replace("Miss","")
+
+# Replace "Ms." with empty string ""
+airlines['full_name'] = airlines['full_name'].str.replace("Ms.","")
+
+# Assert that full_name has no honorifics
+assert airlines['full_name'].str.contains('Ms.|Mr.|Miss|Dr.').any() == False
+
+############################
+
+# Store length of each row in survey_response column
+resp_length = airlines['survey_response'].str.len()
+
+# Find rows in airlines where resp_length > 40
+airlines_survey = airlines[resp_length > 40]
+
+# Assert minimum survey_response length is > 40
+assert airlines_survey['survey_response'].str.len().min() > 40
+
+# Print new survey_response column
+print(airlines_survey['survey_response'])
+
+'''
+    18    The airport personnell forgot to alert us of d...
+    19    The food in the airport was really really expe...
+    20    One of the other travelers was really loud and...
+    21    I don't remember answering the survey with the...
+    22    The airport personnel kept ignoring my request...
+    23    The chair I sat in was extremely uncomfortable...
+    24    I wish you were more like other airports, the ...
+    25    I was really unsatisfied with the wait times b...
+    27    The flight was okay, but I didn't really like ...
+    28    We were really slowed down by security measure...
+    29    There was a spill on the aisle next to the bat...
+    30    I felt very unsatisfied by how long the flight...
+    Name: survey_response, dtype: object
+'''
