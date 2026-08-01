@@ -310,3 +310,139 @@ print(airlines_survey['survey_response'])
     30    I felt very unsatisfied by how long the flight...
     Name: survey_response, dtype: object
 '''
+
+# Uniformity.
+
+banking = ()
+
+# Find values of acct_cur that are equal to 'euro'
+acct_eu = banking['acct_cur'] == 'euro'
+
+# Convert acct_amount where it is in euro to dollars
+# .loc[row, col] -> Loc can be read and/or writte, in this example we are looking in banking for rows
+# that are in euro (acct_eu) and column 'acct_amount' and multiplying the values by 1.1.
+# Then we are assigning the new values to the same rows and column in banking.
+banking.loc[acct_eu, 'acct_amount'] = banking.loc[acct_eu, 'acct_amount'] * 1.1
+
+# Unify acct_cur column by changing 'euro' values to 'dollar'
+# In this example we are looking in banking for rows that are in euro (acct_eu) and column 'acct_cur', and then assining the value 'dollar'.
+banking.loc[acct_eu, 'acct_cur'] = 'dollar'
+
+# Assert that only dollar currency remains
+assert banking['acct_cur'].unique() == 'dollar'
+
+# Print the header of account_opend
+print(banking['account_opened'].head())
+'''
+0          2018-03-05
+1            21-01-18
+2    January 26, 2018
+3            21-14-17
+4            05-06-17
+Name: account_opened, dtype: object
+'''
+
+# Convert account_opened to datetime
+# to_datetime() -> Converts arguments to datetime. For errors handling we have:
+# errors = 'raise' -> Raises an exception, program stops.
+# errors = 'coerce' -> Returns missing value for error. -> NaT.
+# errors = 'ignore' -> Does not convert anything and leave strings as is.
+banking['account_opened'] = pd.to_datetime(banking['account_opened'],
+                                           # Return missing value for error
+                                           errors = 'coerce') 
+
+# Get year of account opened
+# strftime() -> Means "String Format Time". It is used to convert datetime object to string.
+# In this case it transforms to a string with the year only due to the format '%Y'.
+banking['acct_year'] = banking['account_opened'].dt.strftime('%Y')
+
+# Print acct_year
+print(banking['acct_year'])
+'''
+0    2018
+1     NaN
+2     NaN
+3     NaN
+4     NaN
+Name: acct_year, dtype: object
+'''
+
+# Cross field validation.
+
+# Store fund columns to sum against
+fund_columns = ['fund_A', 'fund_B', 'fund_C', 'fund_D']
+
+# Find rows where fund_columns row sum == inv_amount
+# Axis = 1 -> Sum across columns.
+# Axis = 0 -> Sum across rows.
+inv_equ = banking[fund_columns].sum(axis = 1) == banking['inv_amount']
+
+# Store consistent and inconsistent data
+consistent_inv = banking[inv_equ]
+inconsistent_inv = banking[~inv_equ]
+
+# Store consistent and inconsistent data
+print("Number of inconsistent investments: ", inconsistent_inv.shape[0])
+# Number of inconsistent investments:  8
+
+# Store today's date and find ages
+today = dt.date.today()
+
+#Calculate ages_manual by subtracting birth year from current year.
+ages_manual = today.year - banking['birth_date'].dt.year
+
+# Find rows where age column == ages_manual, which it means that the ages are consistent.
+age_equ = ages_manual == banking['age']
+
+# Store consistent and inconsistent data
+consistent_ages = banking[age_equ]
+inconsistent_ages = banking[~age_equ]
+
+# Store consistent and inconsistent data
+print("Number of inconsistent ages: ", inconsistent_ages.shape[0])
+# Number of inconsistent ages:  4
+
+# Completeness.
+
+# Missing Completely at Random: No systematic relationship between a column's missing values and other or own values.
+# Missing at Random: There is a systematic relationship between a column's missing values and other observed values.
+# Missing not at Random: There is a systematic relationship between a column's missing values and unobserved values.
+
+import missingno as msno
+import matplotlib.pyplot as plt
+
+# Print number of missing values in banking
+# isna() -> Detect missing values.
+# Using isna along with sum will give you the total number of missing values in each column.
+print(banking.isna().sum())
+
+# Visualize missingness matrix
+msno.matrix(banking)
+plt.show()
+
+# Isolate missing and non missing values of inv_amount
+# In this example banking is being anidaly index. First we say "get inv_amount column from banking and check if it is missing with isna()".
+# Then we use the return boolean (True or False) to return the all rows of banking where inv_amount is missing.
+# The same logic is applied to the second line, but with the negation operator ~, which means "not".
+missing_investors = banking[banking['inv_amount'].isna()]
+investors = banking[~banking['inv_amount'].isna()]
+
+# Sort banking by age and visualize
+banking_sorted = banking.sort_values(by = 'age')
+msno.matrix(banking_sorted)
+plt.show()
+
+# Mising.
+
+# Drop missing values of cust_id by using subset (only drop rows where cust_id is null)
+# You need to assign the result to a new object, otherwise the original DataFrame will remain unchanged.
+banking_fullid = banking.dropna(subset = ['cust_id'])
+
+# Compute estimated acct_amount using the correct DataFrame
+acct_imp = banking_fullid['inv_amount'] * 5
+
+# Ensure you're imputing the correct column
+banking_imputed = banking_fullid.fillna({'acct_amount': acct_imp})
+
+# Print number of missing values
+print(banking_imputed.isna().sum())
