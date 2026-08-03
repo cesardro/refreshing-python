@@ -446,3 +446,107 @@ banking_imputed = banking_fullid.fillna({'acct_amount': acct_imp})
 
 # Print number of missing values
 print(banking_imputed.isna().sum())
+
+# Fuzz
+
+# Import process from thefuzz
+from thefuzz import process
+
+restaurants = pd.DataFrame({'cuisine_type': ['asian', 'american', 'italian', 'mexican', 'indian', 'aisan', 'amrican', 'italian', 'mesican', 'indain']})
+
+# Store the unique values of cuisine_type in unique_types
+unique_types = restaurants['cuisine_type'].unique()
+
+# Calculate similarity of 'asian' to all values of unique_types
+# process.extract() -> Returns a list of tuples with the matched strings, from highest to lowest.
+# 1st argument -> The strinng to look for.
+# 2nd argument -> The list of strings to look in.
+# 3rd argument -> The number of matches to return. In this case we are returning all the matches by using the length of unique_types.
+print(process.extract('asian', unique_types, limit = len(unique_types)))
+
+# Calculate similarity of 'american' to all values of unique_types
+print(process.extract('american', unique_types, limit = len(unique_types)))
+
+# Calculate similarity of 'italian' to all values of unique_types
+print(process.extract('italian', unique_types, limit = len(unique_types)))
+
+'''
+[('asian', 100), ('asiane', 91), ('asiann', 91), ('asiian', 91), ('asiaan', 91), ('asianne', 83), ('asiat', 80), ('italiann', 72), ('italiano', 72), ('italianne', 72), ('italiaan', 68), ('italiian', 68), ('itallian', 68), ('italian', 67), ('amurican', 62), ('american', 62), ('ameerican', 60), ('aamerican', 60), ('ameriican', 60), ('amerrican', 60), ('ameerrican', 60), ('ammereican', 60), ('americann', 57), ('americano', 57), ('ammericann', 54), ('americin', 51), ('amerycan', 51), ('america', 50), ('merican', 50), ('murican', 50), ('italien', 50), ('americen', 46), ('itali', 40)]
+[('american', 100), ('americann', 94), ('americano', 94), ('ameerican', 94), ('aamerican', 94), ('ameriican', 94), ('amerrican', 94), ('america', 93), ('merican', 93), ('ammericann', 89), ('ameerrican', 89), ('ammereican', 89), ('amurican', 88), ('americen', 88), ('americin', 88), ('amerycan', 88), ('murican', 80), ('asian', 62), ('asiane', 57), ('asiann', 57), ('asiian', 57), ('asiaan', 57), ('italian', 53), ('asianne', 53), ('italiann', 50), ('italiano', 50), ('italiaan', 50), ('italiian', 50), ('itallian', 50), ('italianne', 47), ('asiat', 46), ('itali', 40), ('italien', 40)]
+[('italian', 100), ('italiann', 93), ('italiano', 93), ('italiaan', 93), ('italiian', 93), ('itallian', 93), ('italianne', 88), ('italien', 86), ('itali', 83), ('asian', 67), ('asiane', 62), ('asiann', 62), ('asiian', 62), ('asiaan', 62), ('asianne', 57), ('amurican', 53), ('american', 53), ('americann', 50), ('asiat', 50), ('americano', 50), ('ameerican', 50), ('aamerican', 50), ('ameriican', 50), ('amerrican', 50), ('ammericann', 47), ('ameerrican', 47), ('ammereican', 47), ('america', 43), ('merican', 43), ('murican', 43), ('americen', 40), ('americin', 40), ('amerycan', 40)]
+'''
+
+# Create a list of matches, comparing 'italian' with the cuisine_type column
+matches = process.extract('italian', restaurants['cuisine_type'], limit=len(restaurants.cuisine_type))
+
+# Iterate through the list of matches to italian
+for match in matches:
+  # Check whether the similarity score is greater than or equal to 80
+  if match[1] >= 80:
+    # Select all rows where the cuisine_type is spelled this way, and set them to the correct cuisine
+    restaurants.loc[restaurants['cuisine_type'] == match[0], 'cuisine_type'] = 'italian'
+
+# Pairs
+
+import recordlinkage
+
+restaurants_new = ()
+
+# Create a comparison object
+comp_cl = recordlinkage.Compare()
+
+# Find exact matches on city, cuisine_types
+# Here you are only creating the rule to compare the two DataFrames, it will be city vs city. Its not execute till .compute() is called.
+comp_cl.exact('city', 'city', label='city')
+comp_cl.exact('cuisine_type', 'cuisine_type', label='cuisine_type')
+
+# Find similar matches of rest_name
+comp_cl.string('rest_name', 'rest_name', label='name', threshold = 0.8) 
+
+# Get potential matches and print
+# pairs is a pandas MultiIndex object that tells you which rows are potential matches.
+potential_matches = comp_cl.compute(pairs, restaurants, restaurants_new)
+print(potential_matches)
+
+'''
+            city  cuisine_type  name
+    0   0      0             1   0.0
+        1      0             1   0.0
+        7      0             1   0.0
+        12     0             1   0.0
+        13     0             1   0.0
+    ...      ...           ...   ...
+    334 79     0             1   0.0
+    335 26     0             1   0.0
+        65     0             1   0.0
+        71     0             1   0.0
+        79     0             1   0.0
+'''
+
+# Isolate potential matches with row sum >=3
+matches = potential_matches[potential_matches.sum(axis = 1) >= 3]
+
+# Get values of second column index of matches
+matching_indices = matches.index.get_level_values(1)
+
+# Subset restaurants_new based on non-duplicate values
+non_dup = restaurants_new[~restaurants_new.index.isin(matching_indices)]
+
+# Concatenate restaurants and non_dup
+full_restaurants = pd.concat([restaurants, non_dup])
+print(full_restaurants)
+
+'''
+                        rest_name                  rest_addr               city       phone cuisine_type
+    0   arnie morton's of chicago   435 s. la cienega blv .         los angeles  3102461501     american
+    1          art's delicatessen       12224 ventura blvd.         studio city  8187621221     american
+    2                   campanile       624 s. la brea ave.         los angeles  2139381447     american
+    3                       fenix    8358 sunset blvd. west           hollywood  2138486677     american
+    4          grill on the alley           9560 dayton way         los angeles  3102760615     american
+    ..                        ...                        ...                ...         ...          ...
+    76                        don        1136 westwood blvd.           westwood  3102091422      italian
+    77                      feast        1949 westwood blvd.            west la  3104750400      chinese
+    78                   mulberry        17040 ventura blvd.             encino  8189068881        pizza
+    80                    jiraffe      502 santa monica blvd       santa monica  3109176671  californian
+    81                   martha's  22nd street grill 25 22nd  st. hermosa beach  3103767786     american
+'''
