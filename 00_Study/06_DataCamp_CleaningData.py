@@ -106,7 +106,6 @@ print(ride_sharing['tire_sizes'].describe())
     Name: tire_sizes, dtype: int64
 '''
 
-
 # Convert ride_date to date
 ride_sharing['ride_dt'] = pd.to_datetime(ride_sharing['ride_date']).dt.date
 
