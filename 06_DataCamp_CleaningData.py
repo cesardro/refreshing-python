@@ -1,6 +1,13 @@
 # Numeric Data
 
 # ride_sharing is a DataFrame from Pandas CSV.
+import recordlinkage
+from thefuzz import process
+import matplotlib.pyplot as plt
+import missingno as msno
+import numpy as np
+import datetime as dt
+import pandas as pd
 ride_sharing = []
 # Description of dataframe, with details.
 print(ride_sharing.info())
@@ -41,9 +48,9 @@ Name: user_type, dtype: float64
 ride_sharing['user_type_cat'] = ride_sharing['user_type'].astype('category')
 
 # Write an assert statement confirming the change
-assert ride_sharing['user_type_cat'].dtype  == 'category'
+assert ride_sharing['user_type_cat'].dtype == 'category'
 
-# Print new summary statistics 
+# Print new summary statistics
 print(ride_sharing['user_type_cat'].describe())
 '''
 count     25760
@@ -62,8 +69,8 @@ ride_sharing['duration_time'] = ride_sharing['duration_trim'].astype('int')
 # Write an assert statement making sure of conversion
 assert ride_sharing['duration_time'].dtype == 'int'
 
-# Print formed columns and calculate average ride duration 
-print(ride_sharing[['duration','duration_trim','duration_time']])
+# Print formed columns and calculate average ride duration
+print(ride_sharing[['duration', 'duration_trim', 'duration_time']])
 '''
              duration duration_trim  duration_time
     0      12 minutes           12              12
@@ -78,7 +85,7 @@ print(ride_sharing[['duration','duration_trim','duration_time']])
     25758  14 minutes           14              14
     25759  29 minutes           29              29
 '''
-print(ride_sharing['duration_time'].mean()) #11.389052795031056
+print(ride_sharing['duration_time'].mean())  # 11.389052795031056
 
 # Convert tire_sizes to integer
 ride_sharing['tire_sizes'] = ride_sharing['tire_sizes'].astype('int')
@@ -99,8 +106,6 @@ print(ride_sharing['tire_sizes'].describe())
     Name: tire_sizes, dtype: int64
 '''
 
-import pandas as pd
-import datetime as dt
 
 # Convert ride_date to date
 ride_sharing['ride_dt'] = pd.to_datetime(ride_sharing['ride_date']).dt.date
@@ -112,7 +117,7 @@ today = dt.date.today()
 ride_sharing.loc[ride_sharing['ride_dt'] > today, 'ride_dt'] = today
 
 # Print maximum of ride_dt column
-print(ride_sharing['ride_dt'].max()) #2026-07-30
+print(ride_sharing['ride_dt'].max())  # 2026-07-30
 
 # Duplicates.
 # .duplicated() ->
@@ -126,7 +131,7 @@ duplicates = ride_sharing.duplicated('ride_id', False)
 duplicated_rides = ride_sharing[duplicates].sort_values('ride_id')
 
 # Print relevant columns of duplicated_rides
-print(duplicated_rides[['ride_id','duration','user_birth_year']])
+print(duplicated_rides[['ride_id', 'duration', 'user_birth_year']])
 
 '''
         ride_id  duration  user_birth_year
@@ -155,7 +160,7 @@ statistics = {'user_birth_year': 'min', 'duration': 'mean'}
 ride_unique = ride_dup.groupby('ride_id').agg(statistics).reset_index()
 
 # Find duplicated values again
-duplicates = ride_unique.duplicated(subset = 'ride_id', keep = False)
+duplicates = ride_unique.duplicated(subset='ride_id', keep=False)
 duplicated_rides = ride_unique[duplicates == True]
 
 # Assert duplicates are processed
@@ -208,7 +213,7 @@ print(airlines[cat_clean_rows])
 print(airlines[~cat_clean_rows])
 '''
 
-# Categorical 
+# Categorical
 airlines = ()
 
 # Print unique values of both columns
@@ -224,8 +229,8 @@ print(airlines['dest_size'].unique())
 '''
 
 # Lower dest_region column and then replace "eur" with "europe"
-airlines['dest_region'] = airlines['dest_region'].str.lower() 
-airlines['dest_region'] = airlines['dest_region'].replace({'eur':'europe'})
+airlines['dest_region'] = airlines['dest_region'].str.lower()
+airlines['dest_region'] = airlines['dest_region'].replace({'eur': 'europe'})
 
 # Remove white spaces from `dest_size`
 airlines['dest_size'] = airlines['dest_size'].str.strip()
@@ -239,7 +244,6 @@ print(airlines['dest_size'].unique())
      'europe' 'central/south america' 'australia/new zealand']
     ['Hub' 'Small' 'Medium' 'Large']
 '''
-import numpy as np
 
 # Create ranges -> 0 -------- 60 -------- 180 -------- ∞
 label_ranges = [0, 60, 180, np.inf]
@@ -249,7 +253,8 @@ label_names = ['short', 'medium', 'long']
 # Create wait_type column
 # .cut() converts continue numeric values into categories based on intervals.
 # airlines['wait_min'] -> 45, bins -> range 0-60-180+, labels -> name of catergory
-airlines['wait_type'] = pd.cut(airlines['wait_min'], bins = label_ranges, labels = label_names)
+airlines['wait_type'] = pd.cut(
+    airlines['wait_min'], bins=label_ranges, labels=label_names)
 
 # Create mapping dictionary
 mappings = {
@@ -264,19 +269,19 @@ mappings = {
 
 airlines['day_week'] = airlines['day'].replace(mappings)
 
-# Clean text data. 
+# Clean text data.
 
 # Replace "Dr." with empty string ""
-airlines['full_name'] = airlines['full_name'].str.replace("Dr.","")
+airlines['full_name'] = airlines['full_name'].str.replace("Dr.", "")
 
 # Replace "Mr." with empty string ""
-airlines['full_name'] = airlines['full_name'].str.replace("Mr.","")
+airlines['full_name'] = airlines['full_name'].str.replace("Mr.", "")
 
 # Replace "Miss" with empty string ""
-airlines['full_name'] = airlines['full_name'].str.replace("Miss","")
+airlines['full_name'] = airlines['full_name'].str.replace("Miss", "")
 
 # Replace "Ms." with empty string ""
-airlines['full_name'] = airlines['full_name'].str.replace("Ms.","")
+airlines['full_name'] = airlines['full_name'].str.replace("Ms.", "")
 
 # Assert that full_name has no honorifics
 assert airlines['full_name'].str.contains('Ms.|Mr.|Miss|Dr.').any() == False
@@ -349,7 +354,7 @@ Name: account_opened, dtype: object
 # errors = 'ignore' -> Does not convert anything and leave strings as is.
 banking['account_opened'] = pd.to_datetime(banking['account_opened'],
                                            # Return missing value for error
-                                           errors = 'coerce') 
+                                           errors='coerce')
 
 # Get year of account opened
 # strftime() -> Means "String Format Time". It is used to convert datetime object to string.
@@ -375,7 +380,7 @@ fund_columns = ['fund_A', 'fund_B', 'fund_C', 'fund_D']
 # Find rows where fund_columns row sum == inv_amount
 # Axis = 1 -> Sum across columns.
 # Axis = 0 -> Sum across rows.
-inv_equ = banking[fund_columns].sum(axis = 1) == banking['inv_amount']
+inv_equ = banking[fund_columns].sum(axis=1) == banking['inv_amount']
 
 # Store consistent and inconsistent data
 consistent_inv = banking[inv_equ]
@@ -388,7 +393,7 @@ print("Number of inconsistent investments: ", inconsistent_inv.shape[0])
 # Store today's date and find ages
 today = dt.date.today()
 
-#Calculate ages_manual by subtracting birth year from current year.
+# Calculate ages_manual by subtracting birth year from current year.
 ages_manual = today.year - banking['birth_date'].dt.year
 
 # Find rows where age column == ages_manual, which it means that the ages are consistent.
@@ -408,8 +413,6 @@ print("Number of inconsistent ages: ", inconsistent_ages.shape[0])
 # Missing at Random: There is a systematic relationship between a column's missing values and other observed values.
 # Missing not at Random: There is a systematic relationship between a column's missing values and unobserved values.
 
-import missingno as msno
-import matplotlib.pyplot as plt
 
 # Print number of missing values in banking
 # isna() -> Detect missing values.
@@ -428,7 +431,7 @@ missing_investors = banking[banking['inv_amount'].isna()]
 investors = banking[~banking['inv_amount'].isna()]
 
 # Sort banking by age and visualize
-banking_sorted = banking.sort_values(by = 'age')
+banking_sorted = banking.sort_values(by='age')
 msno.matrix(banking_sorted)
 plt.show()
 
@@ -436,7 +439,7 @@ plt.show()
 
 # Drop missing values of cust_id by using subset (only drop rows where cust_id is null)
 # You need to assign the result to a new object, otherwise the original DataFrame will remain unchanged.
-banking_fullid = banking.dropna(subset = ['cust_id'])
+banking_fullid = banking.dropna(subset=['cust_id'])
 
 # Compute estimated acct_amount using the correct DataFrame
 acct_imp = banking_fullid['inv_amount'] * 5
@@ -450,9 +453,9 @@ print(banking_imputed.isna().sum())
 # Fuzz
 
 # Import process from thefuzz
-from thefuzz import process
 
-restaurants = pd.DataFrame({'cuisine_type': ['asian', 'american', 'italian', 'mexican', 'indian', 'aisan', 'amrican', 'italian', 'mesican', 'indain']})
+restaurants = pd.DataFrame({'cuisine_type': [
+                           'asian', 'american', 'italian', 'mexican', 'indian', 'aisan', 'amrican', 'italian', 'mesican', 'indain']})
 
 # Store the unique values of cuisine_type in unique_types
 unique_types = restaurants['cuisine_type'].unique()
@@ -462,13 +465,13 @@ unique_types = restaurants['cuisine_type'].unique()
 # 1st argument -> The strinng to look for.
 # 2nd argument -> The list of strings to look in.
 # 3rd argument -> The number of matches to return. In this case we are returning all the matches by using the length of unique_types.
-print(process.extract('asian', unique_types, limit = len(unique_types)))
+print(process.extract('asian', unique_types, limit=len(unique_types)))
 
 # Calculate similarity of 'american' to all values of unique_types
-print(process.extract('american', unique_types, limit = len(unique_types)))
+print(process.extract('american', unique_types, limit=len(unique_types)))
 
 # Calculate similarity of 'italian' to all values of unique_types
-print(process.extract('italian', unique_types, limit = len(unique_types)))
+print(process.extract('italian', unique_types, limit=len(unique_types)))
 
 '''
 [('asian', 100), ('asiane', 91), ('asiann', 91), ('asiian', 91), ('asiaan', 91), ('asianne', 83), ('asiat', 80), ('italiann', 72), ('italiano', 72), ('italianne', 72), ('italiaan', 68), ('italiian', 68), ('itallian', 68), ('italian', 67), ('amurican', 62), ('american', 62), ('ameerican', 60), ('aamerican', 60), ('ameriican', 60), ('amerrican', 60), ('ameerrican', 60), ('ammereican', 60), ('americann', 57), ('americano', 57), ('ammericann', 54), ('americin', 51), ('amerycan', 51), ('america', 50), ('merican', 50), ('murican', 50), ('italien', 50), ('americen', 46), ('itali', 40)]
@@ -477,18 +480,19 @@ print(process.extract('italian', unique_types, limit = len(unique_types)))
 '''
 
 # Create a list of matches, comparing 'italian' with the cuisine_type column
-matches = process.extract('italian', restaurants['cuisine_type'], limit=len(restaurants.cuisine_type))
+matches = process.extract(
+    'italian', restaurants['cuisine_type'], limit=len(restaurants.cuisine_type))
 
 # Iterate through the list of matches to italian
 for match in matches:
-  # Check whether the similarity score is greater than or equal to 80
-  if match[1] >= 80:
-    # Select all rows where the cuisine_type is spelled this way, and set them to the correct cuisine
-    restaurants.loc[restaurants['cuisine_type'] == match[0], 'cuisine_type'] = 'italian'
+    # Check whether the similarity score is greater than or equal to 80
+    if match[1] >= 80:
+        # Select all rows where the cuisine_type is spelled this way, and set them to the correct cuisine
+        restaurants.loc[restaurants['cuisine_type']
+                        == match[0], 'cuisine_type'] = 'italian'
 
 # Pairs
 
-import recordlinkage
 
 restaurants_new = ()
 
@@ -501,7 +505,7 @@ comp_cl.exact('city', 'city', label='city')
 comp_cl.exact('cuisine_type', 'cuisine_type', label='cuisine_type')
 
 # Find similar matches of rest_name
-comp_cl.string('rest_name', 'rest_name', label='name', threshold = 0.8) 
+comp_cl.string('rest_name', 'rest_name', label='name', threshold=0.8)
 
 # Get potential matches and print
 # pairs is a pandas MultiIndex object that tells you which rows are potential matches.
@@ -524,7 +528,7 @@ print(potential_matches)
 '''
 
 # Isolate potential matches with row sum >=3
-matches = potential_matches[potential_matches.sum(axis = 1) >= 3]
+matches = potential_matches[potential_matches.sum(axis=1) >= 3]
 
 # Get values of second column index of matches
 matching_indices = matches.index.get_level_values(1)
