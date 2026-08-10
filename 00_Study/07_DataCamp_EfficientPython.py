@@ -285,10 +285,483 @@ possible_pairs = [*combinations(pokemon_types, 2)]
 # Create an empty list called enumerated_tuples
 enumerated_tuples = []
 
-for i,pair in enumerate(possible_pairs, 1):
+for i, pair in enumerate(possible_pairs, 1):
     enumerated_pair_tuple = (i,) + pair
     enumerated_tuples.append(enumerated_pair_tuple)
 
 # Convert all tuples in enumerated_tuples to a list
 enumerated_pairs = [*map(list, enumerated_tuples)]
 print(enumerated_pairs)
+
+# Pandas DataFrame Optimization
+
+pit_df = []  # Only created as dummy, real DF is below.
+'''
+  Team League  Year   RS   RA   W    G  Playoffs
+0  SFG     NL  2012  718  649  94  162         1
+1  SFG     NL  2011  570  578  86  162         0
+2  SFG     NL  2010  697  583  92  162         1
+3  SFG     NL  2009  657  611  88  162         0
+4  SFG     NL  2008  640  759  72  162         0
+'''
+
+# Iterate over pit_df and print each index variable, row, and row type
+for i, row in pit_df.iterrows():
+    print(i)
+    print(row)
+    print(type(row))
+
+'''
+0
+Team         PIT
+League        NL
+Year        2012
+RS           651
+RA           674
+W             79
+G            162
+Playoffs       0
+Name: 0, dtype: object
+<class 'pandas.core.series.Series'>
+
+1
+Team         PIT
+League        NL
+Year        2011
+RS           610
+RA           712
+W             72
+G            162
+Playoffs       0
+Name: 1, dtype: object
+<class 'pandas.core.series.Series'>
+
+2
+Team         PIT
+League        NL
+Year        2010
+RS           587
+RA           866
+W             57
+G            162
+Playoffs       0
+Name: 2, dtype: object
+<class 'pandas.core.series.Series'>
+
+3
+Team         PIT
+League        NL
+Year        2009
+RS           636
+RA           768
+W             62
+G            161
+Playoffs       0
+Name: 3, dtype: object
+<class 'pandas.core.series.Series'>
+
+4
+Team         PIT
+League        NL
+Year        2008
+RS           735
+RA           884
+W             67
+G            162
+Playoffs       0
+Name: 4, dtype: object
+<class 'pandas.core.series.Series'>
+'''
+
+giants_df = []  # Only created as dummy, real DF is below.
+'''
+  Team League  Year   RS   RA   W    G  Playoffs
+0  SFG     NL  2012  718  649  94  162         1
+1  SFG     NL  2011  570  578  86  162         0
+2  SFG     NL  2010  697  583  92  162         1
+3  SFG     NL  2009  657  611  88  162         0
+4  SFG     NL  2008  640  759  72  162         0
+'''
+
+# Create an empty list to store run differentials
+run_diffs = []
+
+# Write a for loop and collect runs allowed and runs scored for each row
+for i, row in giants_df.iterrows():
+    runs_scored = row['RS']
+    runs_allowed = row['RA']
+
+    run_diff = runs_scored - runs_allowed
+
+    # Append each run differential to the output list
+    run_diffs.append(run_diff)
+
+giants_df['RD'] = run_diffs
+print(giants_df)
+
+'''
+    Team League  Year   RS   RA   W    G  Playoffs   RD
+0  SFG     NL  2012  718  649  94  162         1   69
+1  SFG     NL  2011  570  578  86  162         0   -8
+2  SFG     NL  2010  697  583  92  162         1  114
+3  SFG     NL  2009  657  611  88  162         0   46
+4  SFG     NL  2008  640  759  72  162         0 -119
+'''
+
+# Tuples with Pandas
+
+rangers_df = []
+
+# Loop over the DataFrame and print each row
+for row in rangers_df.itertuples():
+    print(row)
+
+'''
+Pandas(Index=0, Team='TEX', League='AL', Year=2012, RS=808, RA=707, W=93, G=162, Playoffs=1)
+Pandas(Index=1, Team='TEX', League='AL', Year=2011, RS=855, RA=677, W=96, G=162, Playoffs=1)
+Pandas(Index=2, Team='TEX', League='AL', Year=2010, RS=787, RA=687, W=90, G=162, Playoffs=1)
+Pandas(Index=3, Team='TEX', League='AL', Year=2009, RS=784, RA=740, W=87, G=162, Playoffs=0)
+Pandas(Index=4, Team='TEX', League='AL', Year=2008, RS=901, RA=967, W=79, G=162, Playoffs=0)
+Pandas(Index=5, Team='TEX', League='AL', Year=2007, RS=816, RA=844, W=75, G=162, Playoffs=0)
+Pandas(Index=6, Team='TEX', League='AL', Year=2006, RS=835, RA=784, W=80, G=162, Playoffs=0)
+Pandas(Index=7, Team='TEX', League='AL', Year=2005, RS=865, RA=858, W=79, G=162, Playoffs=0)
+Pandas(Index=8, Team='TEX', League='AL', Year=2004, RS=860, RA=794, W=89, G=162, Playoffs=0)
+Pandas(Index=9, Team='TEX', League='AL', Year=2003, RS=826, RA=969, W=71, G=162, Playoffs=0)
+Pandas(Index=10, Team='TEX', League='AL', Year=2002, RS=843, RA=882, W=72, G=162, Playoffs=0)
+Pandas(Index=11, Team='TEX', League='AL', Year=2001, RS=890, RA=968, W=73, G=162, Playoffs=0)
+Pandas(Index=12, Team='TEX', League='AL', Year=2000, RS=848, RA=974, W=71, G=162, Playoffs=0)
+Pandas(Index=13, Team='TEX', League='AL', Year=1999, RS=945, RA=859, W=95, G=162, Playoffs=1)
+Pandas(Index=14, Team='TEX', League='AL', Year=1998, RS=940, RA=871, W=88, G=162, Playoffs=1)
+Pandas(Index=15, Team='TEX', League='AL', Year=1997, RS=807, RA=823, W=77, G=162, Playoffs=0)
+Pandas(Index=16, Team='TEX', League='AL', Year=1996, RS=928, RA=799, W=90, G=163, Playoffs=1)
+Pandas(Index=17, Team='TEX', League='AL', Year=1993, RS=835, RA=751, W=86, G=162, Playoffs=0)
+Pandas(Index=18, Team='TEX', League='AL', Year=1992, RS=682, RA=753, W=77, G=162, Playoffs=0)
+Pandas(Index=19, Team='TEX', League='AL', Year=1991, RS=829, RA=814, W=85, G=162, Playoffs=0)
+Pandas(Index=20, Team='TEX', League='AL', Year=1990, RS=676, RA=696, W=83, G=162, Playoffs=0)
+Pandas(Index=21, Team='TEX', League='AL', Year=1989, RS=695, RA=714, W=83, G=162, Playoffs=0)
+Pandas(Index=22, Team='TEX', League='AL', Year=1988, RS=637, RA=735, W=70, G=161, Playoffs=0)
+Pandas(Index=23, Team='TEX', League='AL', Year=1987, RS=823, RA=849, W=75, G=162, Playoffs=0)
+Pandas(Index=24, Team='TEX', League='AL', Year=1986, RS=771, RA=743, W=87, G=162, Playoffs=0)
+Pandas(Index=25, Team='TEX', League='AL', Year=1985, RS=617, RA=785, W=62, G=161, Playoffs=0)
+Pandas(Index=26, Team='TEX', League='AL', Year=1984, RS=656, RA=714, W=69, G=161, Playoffs=0)
+Pandas(Index=27, Team='TEX', League='AL', Year=1983, RS=639, RA=609, W=77, G=163, Playoffs=0)
+Pandas(Index=28, Team='TEX', League='AL', Year=1982, RS=590, RA=749, W=64, G=162, Playoffs=0)
+Pandas(Index=29, Team='TEX', League='AL', Year=1980, RS=756, RA=752, W=76, G=163, Playoffs=0)
+Pandas(Index=30, Team='TEX', League='AL', Year=1979, RS=750, RA=698, W=83, G=162, Playoffs=0)
+Pandas(Index=31, Team='TEX', League='AL', Year=1978, RS=692, RA=632, W=87, G=162, Playoffs=0)
+Pandas(Index=32, Team='TEX', League='AL', Year=1977, RS=767, RA=657, W=94, G=162, Playoffs=0)
+Pandas(Index=33, Team='TEX', League='AL', Year=1976, RS=616, RA=652, W=76, G=162, Playoffs=0)
+Pandas(Index=34, Team='TEX', League='AL', Year=1975, RS=714, RA=733, W=79, G=162, Playoffs=0)
+Pandas(Index=35, Team='TEX', League='AL', Year=1974, RS=690, RA=698, W=83, G=161, Playoffs=0)
+Pandas(Index=36, Team='TEX', League='AL', Year=1973, RS=619, RA=844, W=57, G=162, Playoffs=0)
+'''
+
+# Loop over the DataFrame and print each row's Index, Year and Wins (W)
+for row in rangers_df.itertuples():
+    i = row.Index
+    year = row.Year
+    wins = row.W
+    print(i, year, wins)
+
+'''
+    0 2012 93
+    1 2011 96
+    2 2010 90
+    3 2009 87
+    4 2008 79
+    5 2007 75
+    6 2006 80
+    7 2005 79
+    8 2004 89
+    9 2003 71
+    10 2002 72
+    11 2001 73
+    12 2000 71
+    13 1999 95
+    14 1998 88
+    15 1997 77
+    16 1996 90
+    17 1993 86
+    18 1992 77
+    19 1991 85
+    20 1990 83
+    21 1989 83
+    22 1988 70
+    23 1987 75
+    24 1986 87
+    25 1985 62
+    26 1984 69
+    27 1983 77
+    28 1982 64
+    29 1980 76
+    30 1979 83
+    31 1978 87
+    32 1977 94
+    33 1976 76
+    34 1975 79
+    35 1974 83
+    36 1973 57
+'''
+yankees_df = []
+
+run_diffs = []
+
+# Loop over the DataFrame and calculate each row's run differential
+for row in yankees_df.itertuples():
+
+    runs_scored = row.RS
+    runs_allowed = row.RA
+
+    run_diff = runs_scored - runs_allowed
+
+    run_diffs.append(run_diff)
+
+# Append new column
+yankees_df['RD'] = run_diffs
+print(yankees_df)
+
+'''
+       Team League  Year   RS   RA    W    G  Playoffs   RD
+    0   NYY     AL  2012  804  668   95  162         1  136
+    1   NYY     AL  2011  867  657   97  162         1  210
+    2   NYY     AL  2010  859  693   95  162         1  166
+    3   NYY     AL  2009  915  753  103  162         1  162
+    4   NYY     AL  2008  789  727   89  162         0   62
+    5   NYY     AL  2007  968  777   94  162         1  191
+    6   NYY     AL  2006  930  767   97  162         1  163
+    7   NYY     AL  2005  886  789   95  162         1   97
+    8   NYY     AL  2004  897  808  101  162         1   89
+    9   NYY     AL  2003  877  716  101  163         1  161
+    10  NYY     AL  2002  897  697  103  161         1  200
+    11  NYY     AL  2001  804  713   95  161         1   91
+    12  NYY     AL  2000  871  814   87  161         1   57
+    13  NYY     AL  1999  900  731   98  162         1  169
+    14  NYY     AL  1998  965  656  114  162         1  309
+    15  NYY     AL  1997  891  688   96  162         1  203
+    16  NYY     AL  1996  871  787   92  162         1   84
+    17  NYY     AL  1993  821  761   88  162         0   60
+    18  NYY     AL  1992  733  746   76  162         0  -13
+    19  NYY     AL  1991  674  777   71  162         0 -103
+    20  NYY     AL  1990  603  749   67  162         0 -146
+    21  NYY     AL  1989  698  792   74  161         0  -94
+    22  NYY     AL  1988  772  748   85  161         0   24
+    23  NYY     AL  1987  788  758   89  162         0   30
+    24  NYY     AL  1986  797  738   90  162         0   59
+    25  NYY     AL  1985  839  660   97  161         0  179
+    26  NYY     AL  1984  758  679   87  162         0   79
+    27  NYY     AL  1983  770  703   91  162         0   67
+    28  NYY     AL  1982  709  716   79  162         0   -7
+    29  NYY     AL  1980  820  662  103  162         1  158
+    30  NYY     AL  1979  734  672   89  160         0   62
+    31  NYY     AL  1978  735  582  100  163         1  153
+    32  NYY     AL  1977  831  651  100  162         1  180
+    33  NYY     AL  1976  730  575   97  159         1  155
+    34  NYY     AL  1975  681  588   83  160         0   93
+    35  NYY     AL  1974  671  623   89  162         0   48
+    36  NYY     AL  1973  641  610   80  162         0   31
+    37  NYY     AL  1971  648  641   81  162         0    7
+    38  NYY     AL  1970  680  612   93  163         0   68
+    39  NYY     AL  1969  562  587   80  162         0  -25
+    40  NYY     AL  1968  536  531   83  164         0    5
+    41  NYY     AL  1967  522  621   72  163         0  -99
+    42  NYY     AL  1966  611  612   70  160         0   -1
+    43  NYY     AL  1965  611  604   77  162         0    7
+    44  NYY     AL  1964  730  577   99  164         1  153
+    45  NYY     AL  1963  714  547  104  161         1  167
+    46  NYY     AL  1962  817  680   96  162         1  137
+'''
+
+# Using .apply() = like a .map
+# apply(what, where):
+# what -> the function to apply
+# where -> axis = 1 (rows) or arix = 0 (columns)
+
+rays_df = []
+
+'''
+       RS   RA   W  Playoffs
+2012  697  577  90         0
+2011  707  614  91         1
+2010  802  649  96         1
+2009  803  754  84         0
+2008  774  671  97         1
+'''
+
+# Gather sum of all columns
+stat_totals = rays_df.apply(sum, axis=0)
+print(stat_totals)
+
+'''
+RS          3783
+RA          3265
+W            458
+Playoffs       3
+'''
+
+# Gather total runs scored in all games per year
+total_runs_scored = rays_df[['RS', 'RA']].apply(sum, axis=1)
+print(total_runs_scored)
+
+'''
+2012    1274
+2011    1321
+2010    1451
+2009    1557
+2008    1445
+'''
+
+
+def text_playoffs(num_playoffs):
+    if num_playoffs == 1:
+        return 'Yes'
+    else:
+        return 'No'
+
+
+# Convert numeric playoffs to text by applying text_playoffs()
+textual_playoffs = rays_df.apply(
+    lambda row: text_playoffs(row['Playoffs']), axis=1)
+print(textual_playoffs)
+
+'''
+2012     No
+2011    Yes
+2010    Yes
+2009     No
+2008    Yes
+'''
+
+dbacks_df = []
+
+
+def calc_win_perc(wins, games_played):
+    win_perc = wins / games_played
+    return np.round(win_perc, 2)
+
+
+# Display the first five rows of the DataFrame
+print(dbacks_df.head())
+'''
+  Team League  Year   RS   RA   W    G  Playoffs
+0  ARI     NL  2012  734  688  81  162         0
+1  ARI     NL  2011  731  662  94  162         1
+2  ARI     NL  2010  713  836  65  162         0
+3  ARI     NL  2009  720  782  70  162         0
+4  ARI     NL  2008  720  706  82  162         0
+'''
+
+# Create a win percentage Series
+win_percs = dbacks_df.apply(
+    lambda row: calc_win_perc(row['W'], row['G']), axis=1)
+print(win_percs, '\n')
+'''
+0     0.50
+1     0.58
+2     0.40
+3     0.43
+4     0.51
+5     0.56
+6     0.47
+7     0.48
+8     0.31
+9     0.52
+10    0.60
+11    0.57
+12    0.52
+13    0.62
+14    0.40
+'''
+
+# Append a new column to dbacks_df
+dbacks_df['WP'] = win_percs
+print(dbacks_df, '\n')
+'''
+   Team League  Year   RS   RA    W    G  Playoffs    WP
+0   ARI     NL  2012  734  688   81  162         0  0.50
+1   ARI     NL  2011  731  662   94  162         1  0.58
+2   ARI     NL  2010  713  836   65  162         0  0.40
+3   ARI     NL  2009  720  782   70  162         0  0.43
+4   ARI     NL  2008  720  706   82  162         0  0.51
+5   ARI     NL  2007  712  732   90  162         1  0.56
+6   ARI     NL  2006  773  788   76  162         0  0.47
+7   ARI     NL  2005  696  856   77  162         0  0.48
+8   ARI     NL  2004  615  899   51  162         0  0.31
+9   ARI     NL  2003  717  685   84  162         0  0.52
+10  ARI     NL  2002  819  674   98  162         1  0.60
+11  ARI     NL  2001  818  677   92  162         1  0.57
+12  ARI     NL  2000  792  754   85  162         0  0.52
+13  ARI     NL  1999  908  676  100  162         1  0.62
+14  ARI     NL  1998  665  812   65  162         0  0.40 
+'''
+
+# Display dbacks_df where WP is greater than 0.50
+print(dbacks_df[dbacks_df['WP'] >= 0.50])
+'''
+   Team League  Year   RS   RA    W    G  Playoffs    WP
+0   ARI     NL  2012  734  688   81  162         0  0.50
+1   ARI     NL  2011  731  662   94  162         1  0.58
+4   ARI     NL  2008  720  706   82  162         0  0.51
+5   ARI     NL  2007  712  732   90  162         1  0.56
+9   ARI     NL  2003  717  685   84  162         0  0.52
+10  ARI     NL  2002  819  674   98  162         1  0.60
+11  ARI     NL  2001  818  677   92  162         1  0.57
+12  ARI     NL  2000  792  754   85  162         0  0.52
+13  ARI     NL  1999  908  676  100  162         1  0.62
+'''
+
+baseball_df = []
+
+# Use the W array and G array to calculate win percentages
+win_percs_np = calc_win_perc(baseball_df['W'].values, baseball_df['G'].values)
+'''
+.values ->
+[ 81  94  93 ... 103  84  60]
+[162 162 162 ... 165 163 162]
+'''
+
+# Append a new column to baseball_df that stores all win percentages
+baseball_df['WP'] = win_percs_np
+
+print(baseball_df.head())
+'''
+  Team League  Year   RS   RA   W    G  Playoffs    WP
+0  ARI     NL  2012  734  688  81  162         0  0.50
+1  ATL     NL  2012  700  600  94  162         1  0.58
+2  BAL     AL  2012  712  705  93  162         1  0.57
+3  BOS     AL  2012  734  806  69  162         0  0.43
+4  CHC     NL  2012  613  759  61  162         0  0.38
+'''
+
+# ********************** ALTOGETHER ********************** 
+
+def predict_win_perc(RS, RA):
+    prediction = RS ** 2 / (RS ** 2 + RA ** 2)
+    return np.round(prediction, 2)
+
+win_perc_preds_loop = []
+
+# Use a loop and .itertuples() to collect each row's predicted win percentage
+for row in baseball_df.itertuples():
+    runs_scored = row.RS
+    runs_allowed = row.RA
+    win_perc_pred = predict_win_perc(runs_scored, runs_allowed)
+    win_perc_preds_loop.append(win_perc_pred)
+baseball_df['WP_loop'] = win_perc_preds_loop
+
+# Apply predict_win_perc to each row of the DataFrame
+win_perc_preds_apply = baseball_df.apply(lambda row: predict_win_perc(row['RS'], row['RA']), axis=1)
+baseball_df['WP_apply'] = win_perc_preds_apply
+
+# Calculate the win percentage predictions using NumPy arrays
+win_perc_preds_np = predict_win_perc(baseball_df['RS'].values, baseball_df['RA'].values)
+baseball_df['WP_preds'] = win_perc_preds_np
+print(baseball_df.head())
+
+'''
+  Team League  Year   RS   RA  ...  Playoffs    WP  WP_preds  WP_loop  WP_apply
+0  ARI     NL  2012  734  688  ...         0  0.50      0.53     0.53      0.53
+1  ATL     NL  2012  700  600  ...         1  0.58      0.58     0.58      0.58
+2  BAL     AL  2012  712  705  ...         1  0.57      0.50     0.50      0.50
+3  BOS     AL  2012  734  806  ...         0  0.43      0.45     0.45      0.45
+4  CHC     NL  2012  613  759  ...         0  0.38      0.39     0.39      0.39
+'''
