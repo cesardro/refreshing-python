@@ -278,3 +278,60 @@ print(survey_data.Part2EndTime.head())
 3   2016-03-29 21:30:51
 4   2016-03-29 21:31:54
 '''
+
+from sqlalchemy import create_engine
+
+# Create the database engine
+engine = create_engine("sqlite:///data.db")
+
+# View the tables in the database
+print(engine.table_names())
+
+'''
+['boro_census', 'hpd311calls', 'weather']
+'''
+
+# Create the database engine
+engine = create_engine('sqlite:///data.db')
+
+# Load hpd311calls without any SQL
+hpd_calls = pd.read_sql('hpd311calls', engine)
+
+# View the first few rows of data
+print(hpd_calls.head())
+
+'''
+      unique_key created_date agency  complaint_type incident_zip      incident_address community_board    borough
+    0   38070822   01/01/2018    HPD  HEAT/HOT WATER        10468    2786 JEROME AVENUE        07 BRONX      BRONX
+    1   38065299   01/01/2018    HPD        PLUMBING        10003  323 EAST   12 STREET    03 MANHATTAN  MANHATTAN
+    2   38066653   01/01/2018    HPD  HEAT/HOT WATER        10452  1235 GRAND CONCOURSE        04 BRONX      BRONX
+    3   38070264   01/01/2018    HPD  HEAT/HOT WATER        10032  656 WEST  171 STREET    12 MANHATTAN  MANHATTAN
+    4   38072466   01/01/2018    HPD  HEAT/HOT WATER        11213       1030 PARK PLACE     08 BROOKLYN   BROOKLYN
+'''
+
+# Create query for records with max temps <= 32 or snow >= 1
+query = """
+SELECT *
+  FROM weather
+  where tmax <= 32
+  or snow >= 1;
+"""
+
+# Query database and assign result to wintry_days
+wintry_days = pd.read_sql(query, engine)
+
+# View summary stats about the temperatures
+print(wintry_days.describe())
+
+'''
+            latitude  longitude  elevation    awnd    prcp    snow    tmax    tmin
+    count  2.500e+01  2.500e+01  2.500e+01  25.000  25.000  25.000  25.000  25.000
+    mean   4.078e+01 -7.397e+01  4.270e+01   7.740   0.176   1.332  27.320  17.160
+    std    7.252e-15  1.450e-14  7.252e-15   2.622   0.369   2.685   7.122   7.674
+    min    4.078e+01 -7.397e+01  4.270e+01   3.130   0.000   0.000  13.000   5.000
+    25%    4.078e+01 -7.397e+01  4.270e+01   5.820   0.000   0.000  22.000  11.000
+    50%    4.078e+01 -7.397e+01  4.270e+01   7.830   0.000   0.000  28.000  17.000
+    75%    4.078e+01 -7.397e+01  4.270e+01   9.170   0.090   1.200  31.000  20.000
+    max    4.078e+01 -7.397e+01  4.270e+01  12.970   1.410   9.800  40.000  33.000
+'''
+
