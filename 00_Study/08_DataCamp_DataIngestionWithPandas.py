@@ -1,4 +1,7 @@
 # Flat Files
+from pandas.io.json import json_normalize
+import requests
+from sqlalchemy import create_engine
 import pandas as pd
 
 # Create list of columns to use
@@ -249,11 +252,11 @@ survey_df["Part2EndTime"] = pd.to_datetime(survey_df["Part2EndTime"],format=form
 
 # Parse datetimes and assign result back to Part2EndTime
 survey_data["Part2EndTime"] = pd.to_datetime(survey_data["Part2EndTime"],
-                                   format = "%m%d%Y %H:%M:%S")
+                                             format="%m%d%Y %H:%M:%S")
 
 print(survey_data.Part2EndTime.head())
 
-# Before: 
+# Before:
 
 '''
 0      03292016 21:27:25
@@ -277,4 +280,176 @@ print(survey_data.Part2EndTime.head())
 2   2016-03-29 21:28:21
 3   2016-03-29 21:30:51
 4   2016-03-29 21:31:54
+'''
+
+
+# Create the database engine
+engine = create_engine("sqlite:///data.db")
+
+# View the tables in the database
+print(engine.table_names())
+
+'''
+['boro_census', 'hpd311calls', 'weather']
+'''
+
+# Create the database engine
+engine = create_engine('sqlite:///data.db')
+
+# Load hpd311calls without any SQL
+hpd_calls = pd.read_sql('hpd311calls', engine)
+
+# View the first few rows of data
+print(hpd_calls.head())
+
+'''
+      unique_key created_date agency  complaint_type incident_zip      incident_address community_board    borough
+    0   38070822   01/01/2018    HPD  HEAT/HOT WATER        10468    2786 JEROME AVENUE        07 BRONX      BRONX
+    1   38065299   01/01/2018    HPD        PLUMBING        10003  323 EAST   12 STREET    03 MANHATTAN  MANHATTAN
+    2   38066653   01/01/2018    HPD  HEAT/HOT WATER        10452  1235 GRAND CONCOURSE        04 BRONX      BRONX
+    3   38070264   01/01/2018    HPD  HEAT/HOT WATER        10032  656 WEST  171 STREET    12 MANHATTAN  MANHATTAN
+    4   38072466   01/01/2018    HPD  HEAT/HOT WATER        11213       1030 PARK PLACE     08 BROOKLYN   BROOKLYN
+'''
+
+# Create query for records with max temps <= 32 or snow >= 1
+query = """
+SELECT *
+  FROM weather
+  where tmax <= 32
+  or snow >= 1;
+"""
+
+# Query database and assign result to wintry_days
+wintry_days = pd.read_sql(query, engine)
+
+# View summary stats about the temperatures
+print(wintry_days.describe())
+
+'''
+            latitude  longitude  elevation    awnd    prcp    snow    tmax    tmin
+    count  2.500e+01  2.500e+01  2.500e+01  25.000  25.000  25.000  25.000  25.000
+    mean   4.078e+01 -7.397e+01  4.270e+01   7.740   0.176   1.332  27.320  17.160
+    std    7.252e-15  1.450e-14  7.252e-15   2.622   0.369   2.685   7.122   7.674
+    min    4.078e+01 -7.397e+01  4.270e+01   3.130   0.000   0.000  13.000   5.000
+    25%    4.078e+01 -7.397e+01  4.270e+01   5.820   0.000   0.000  22.000  11.000
+    50%    4.078e+01 -7.397e+01  4.270e+01   7.830   0.000   0.000  28.000  17.000
+    75%    4.078e+01 -7.397e+01  4.270e+01   9.170   0.090   1.200  31.000  20.000
+    max    4.078e+01 -7.397e+01  4.270e+01  12.970   1.410   9.800  40.000  33.000
+'''
+
+# JSON
+
+# Load the daily report to a dataframe
+pop_in_shelters = pd.read_json('dhs_daily_report.json')
+
+# View summary stats about pop_in_shelters
+print(pop_in_shelters.describe())
+
+# API
+
+api_url = "https://api.yelp.com/v3/businesses/search"
+
+headers = {'Authorization': 'Bearer mhmt6jn3SFPVC1u6pfwgHWQvsa1wmWvCpKRtFGRYlo4mzA14SisQiDjyygsGMV2Dm7tEsuwdC4TYSA0Ai_GQTjKf9d5s5XLSNfQqdg1oy7jcBBh1i7iQUZBujdA_XHYx'}
+params = {'term': 'cafe', 'location': 'NYC'}
+
+# Get data about NYC cafes from the Yelp API
+response = requests.get(api_url,
+                        headers=headers,
+                        params=params)
+
+# Extract JSON data from the response
+data = response.json()
+
+# Load data to a dataframe
+cafes = pd.DataFrame(data["businesses"])
+
+# View the data's dtypes
+print(cafes.dtypes)
+
+
+# Create dictionary that passes Authorization and key string
+headers = {"Authorization": "Bearer {}".format(api_key)}
+
+# Query the Yelp API with headers and params set
+response = requests.get(api_url, params=params, headers=headers)
+
+# Extract JSON data from response
+data = response.json()
+
+# Load "businesses" values to a dataframe and print names
+cafes = pd.DataFrame(data["businesses"])
+print(cafes.name)
+
+# Nested APIs
+
+
+# data["businesses"] -> I want to work with the list inside of business.
+# sep="_" -> If inside of categories there is a nested dictionary, I will convert it to a flat string: "food_type"
+# record_path="categories" -> I want each element of categories to be a row.
+# meta -> I want to keep the following columns from the original dataframe and add them to each row of the new dataframe.
+flat_cafes = json_normalize(
+    data["businesses"],
+    sep="_",
+    record_path="categories",
+    meta=[
+        "name",
+        "alias",
+        "rating",
+        ["coordinates", "latitude"],
+        ["coordinates", "longitude"]
+    ],
+    meta_prefix="biz_"
+)
+
+'''
+              alias              title           biz_name                   biz_alias biz_rating biz_coordinates_latitude biz_coordinates_longitude
+0            coffee       Coffee & Tea        White Noise      white-noise-brooklyn-2        4.5                   40.689                   -73.988
+1            coffee       Coffee & Tea           Devocion         devocion-brooklyn-3        4.0                   40.689                   -73.983
+2  coffeeroasteries  Coffee Roasteries           Devocion         devocion-brooklyn-3        4.0                   40.689                   -73.983
+3             cafes              Cafes           Devocion         devocion-brooklyn-3        4.0                   40.689                   -73.983
+4            coffee       Coffee & Tea  Coffee Project NY  coffee-project-ny-new-york        4.5                   40.727                   -73.989
+'''
+
+# Concat
+
+# Add an offset parameter to get cafes 51-100
+params = {"term": "cafe", 
+          "location": "NYC",
+          "sort_by": "rating", 
+          "limit": 50,
+          "offset": 50}
+
+result = requests.get(api_url, headers=headers, params=params)
+next_50_cafes = json_normalize(result.json()["businesses"])
+
+# Concatenate the results, setting ignore_index to renumber rows
+cafes = pd.concat([top_50_cafes,next_50_cafes],ignore_index=True)
+
+# Print shape of cafes
+print(cafes.shape) #(100, 24)
+
+
+# Merge crosswalk into cafes on their zip code fields
+cafes_with_pumas = cafes.merge(crosswalk, left_on='location_zip_code',right_on='zipcode')
+
+# Merge pop_data into cafes_with_pumas on puma field
+cafes_with_pop = cafes_with_pumas.merge(pop_data, left_on='puma',right_on='puma')
+
+# View the data
+print(cafes_with_pop.head())
+
+'''
+                            alias                                         categories  coordinates_latitude  coordinates_longitude   display_phone  ...  geo_type  \
+    0  coffee-project-ny-new-york     [{'alias': 'coffee', 'title': 'Coffee & Tea'}]                40.727                -73.989  (212) 228-7888  ...  PUMA2010   
+    1   saltwater-coffee-new-york     [{'alias': 'coffee', 'title': 'Coffee & Tea'}]                40.730                -73.984  (917) 881-2245  ...  PUMA2010   
+    2   daily-provisions-new-york  [{'alias': 'cafes', 'title': 'Cafes'}, {'alias...                40.738                -73.988  (212) 488-1505  ...  PUMA2010   
+    3              mud-new-york-3  [{'alias': 'coffee', 'title': 'Coffee & Tea'},...                40.729                -73.987  (212) 228-9074  ...  PUMA2010   
+    4  coffee-project-ny-new-york     [{'alias': 'coffee', 'title': 'Coffee & Tea'}]                40.727                -73.989  (212) 228-7888  ...  PUMA2010   
+    
+                                               geog_name    borough  total_pop_estimate total_pop_moe  
+    0  NYC-Manhattan Community District 3--Chinatown ...  Manhattan              160709          3289  
+    1  NYC-Manhattan Community District 3--Chinatown ...  Manhattan              160709          3289  
+    2  NYC-Manhattan Community District 3--Chinatown ...  Manhattan              160709          3289  
+    3  NYC-Manhattan Community District 3--Chinatown ...  Manhattan              160709          3289  
+    4  NYC-Manhattan Community District 3--Chinatown ...  Manhattan              160709          3289  
 '''
