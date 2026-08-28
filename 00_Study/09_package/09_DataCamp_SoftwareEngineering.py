@@ -36,3 +36,93 @@ print(result.messages)
 import my_package
 
 my_package.we_need_to_talk(break_up=True)
+
+##################################################
+
+datacamp_tweet = "Basic linear regression example. #DataCamp #DataScience #Python #sklearn"
+
+# Create an instance of Document with datacamp_tweet
+my_document = my_package.Document(text=datacamp_tweet)
+
+# Print the text attribute of the Document instance
+print(my_document.text)
+
+##################################################
+
+datacamp_tweets = """
+[DataCamp] Introduction to H2O AutoML --> In this tutorial, you will learn about H2O and have a glimpse of its auto…
+[DataCamp] Stocks, Significance Testing & p-Hacking --> Learn how to manipulate time series data with pandas and co…
+RT @cbismuth: Linear regression example with most significant features detection. #DataCamp #DataScience #Python #sklearn …
+Linear regression example with most significant features detection. #DataCamp #DataScience #Python #sklearn
+Basic linear regression example. #DataCamp #DataScience #Python #sklearn
+RT @David_Makinde_: I just completed Introduction to Python for Data Science 
+#Datacamp
+#DataScience 
+#Python
+[DataCamp] Enter the #DataFramedChallenge for a chance to be on an upcoming podcast segment. --> DataCamp has a pod…
+[DataCamp] Introduction to Python Metaclasses --> In this tutorial, you'll learn about metaclasses in Python. by De…
+I just completed Introduction to Python for Data Science 
+#Datacamp
+#DataScience 
+#Python
+RT @cbismuth: My pretty first classifier! #DataCamp #Python #sklearn
+My pretty first classifier! #DataCamp #Python #sklearn
+RT @ascentt: The different #DataScience roles on the job market.
+"""
+
+# create a new document instance from datacamp_tweets
+datacamp_doc = my_package.Document(text=datacamp_tweets)
+
+# print the first 5 tokens from datacamp_doc
+print(datacamp_doc.tokens[:5])
+
+# print the top 5 most used words in datacamp_doc
+print(datacamp_doc.word_counts.most_common(5))
+
+##################################################
+
+# Docs
+
+"""
+rapunzel(hair_len=20)
+    Lets down hair from tower to be used as climbing rope
+
+    :param hair_len: length of hair (cannot be negative)
+    :return: strand of hair that is hair_len characters long
+
+    >>> rapunzel(hair_len=15)
+    '~~~~~~~~~~~~~~~'
+"""
+
+# Complete the function's docstring
+def tokenize(text, regex=r'[a-zA-z]+'):
+  """Split text into tokens using a regular expression
+
+  :param text: text to be tokenized
+  :param regex: regular expression used to match tokens using re.findall 
+  :return: a list of resulting tokens
+
+  >>> tokenize('the rain in spain')
+  ['the', 'rain', 'in', 'spain']
+  """
+  return re.findall(regex, text, flags=re.IGNORECASE)
+
+# Print the docstring
+help(tokenize)
+
+##################################################
+
+def sum_counters(counters):
+    """Aggregate collections.Counter objects by summing counts
+
+    :param counters: list/tuple of counters to sum
+    :return: aggregated counters with counts summed
+
+    >>> d1 = text_analyzer.Document('1 2 fizz 4 buzz fizz 7 8')
+    >>> d2 = text_analyzer.Document('fizz buzz 11 fizz 13 14')
+    >>> sum_counters([d1.word_counts, d2.word_counts])
+    Counter({'fizz': 4, 'buzz': 2})
+    """
+    return sum(counters, Counter())
+
+doctest.testmod()
