@@ -255,3 +255,95 @@ except KeyError as ke:
 	# Create the "Total Price" column, transform the updated DataFrame
 	raw_sales_data["Total Price"] = raw_sales_data["Price Each"] * raw_sales_data["Quantity Ordered"]
 	clean_sales_data = transform(raw_sales_data)
+
+####################################################
+
+raw_tax_data = extract("raw_tax_data.csv")
+clean_tax_data = transform(raw_tax_data)
+load(clean_tax_data, "clean_tax_data.parquet")
+
+print(f"Shape of raw_tax_data: {raw_tax_data.shape}")
+print(f"Shape of clean_tax_data: {clean_tax_data.shape}")
+
+to_validate = pd.read_parquet("clean_tax_data.parquet")
+print(clean_tax_data.head(3))
+print(to_validate.head(3))
+
+# Check that the DataFrames are equal
+print(to_validate.equals(clean_tax_data))
+
+
+####################################################
+
+# Trigger the data pipeline to run three times
+for attempt in range(0, 3):
+	print(f"Attempt: {attempt}")
+	raw_tax_data = extract("raw_tax_data.csv")
+	clean_tax_data = transform(raw_tax_data)
+	load(clean_tax_data, "clean_tax_data.parquet")
+	
+	# Print the shape of the cleaned_tax_data DataFrame
+	print(f"Shape of clean_tax_data: {clean_tax_data.shape}")
+    
+# Read in the loaded data, check the shape
+to_validate = pd.read_parquet("clean_tax_data.parquet")
+print(f"Final shape of cleaned data: {to_validate.shape}")
+
+####################################################
+
+raw_tax_data = extract("raw_tax_data.csv")
+clean_tax_data = transform(raw_tax_data)
+
+# Validate the number of columns in the DataFrame
+assert len(clean_tax_data.columns) == 5
+
+####################################################
+
+raw_tax_data = extract("raw_tax_data.csv")
+clean_tax_data = transform(raw_tax_data)
+
+# Determine if the clean_tax_data DataFrames take type pd.DataFrame
+isinstance(clean_tax_data, pd.DataFrame)
+
+####################################################
+
+# Import pytest
+import pytest
+
+# Create a pytest fixture
+@pytest.fixture()
+def raw_tax_data():
+	raw_data = extract("raw_tax_data.csv")
+    
+    # Return the raw DataFrame
+	return raw_data
+
+####################################################
+
+@pytest.fixture()
+def clean_tax_data():
+    raw_data = pd.read_csv("raw_tax_data.csv")
+    clean_data = transform(raw_data)
+    return clean_data
+
+# Pass the fixture to the function
+def test_tax_rate(clean_tax_data):
+    # Assert values are within the expected range
+    assert clean_tax_data["tax_rate"].max() <= 1 and clean_tax_data["tax_rate"].min() >= 0
+
+####################################################
+
+import logging
+from pipeline_utils import extract, transform, load
+
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
+
+try:
+	raw_tax_data = extract("raw_tax_data.csv")
+	clean_tax_data = transform(raw_tax_data)
+	load(clean_tax_data, "clean_tax_data.parquet")
+    
+	logging.info("Successfully extracted, transformed and loaded data.")  # Log a success message.
+    
+except Exception as e:
+	logging.error(f"Pipeline failed with error: {e}")  # Log failure message
