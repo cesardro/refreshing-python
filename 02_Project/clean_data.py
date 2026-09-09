@@ -33,7 +33,6 @@ def transform(raw_data):
     raw_data = raw_data.fillna(0)
     raw_data["Date"] = pd.to_datetime(raw_data["Date"], errors='coerce')
     raw_data["Month"] = raw_data["Date"].dt.month
-    raw_data.groupby(["Month"])["Weekly_Sales"].sum()
     raw_data = raw_data.loc[raw_data['Weekly_Sales'] > 10000, ["Store_ID","Month", "Dept","IsHoliday","Weekly_Sales","CPI","Unemployment"]]
     print(raw_data)
     return raw_data 
@@ -101,8 +100,8 @@ load(clean_data, "clean_data.csv", agg_data, "agg_data.csv")
 
 # Create the validation() function with one parameter: file_path - to check whether the previous function was correctly executed
 def validation(file_path):
-    # Write your code here
-    pd.read_csv(file_path)
+    if not os.path.exists(file_path):
+        raise Exception(f"There is no file at the path {file_path}")
 
 # Call the validation() function and pass first, the cleaned DataFrame path, and then the aggregated DataFrame path
 validation("clean_data.csv")
