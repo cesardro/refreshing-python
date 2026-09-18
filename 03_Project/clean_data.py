@@ -8,7 +8,7 @@ audible = pd.read_csv("03_Project/audible_raw.csv")
 # View the first rows of the dataframe
 audible
 
-# Inspect the columns' data types
+# Inspect the columns' data types 
 audible.info()
 
 # Remove Writtenby: from the author column
