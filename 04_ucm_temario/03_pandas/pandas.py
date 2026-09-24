@@ -60,6 +60,38 @@ summary_df
 
 print('##############################################')
 
+# Grouping for more than one column.
+
+orders_df = []
+trips_df = []
+
+orders_df[['location', 'category']].drop_duplicates()
+
+summary_df = orders_df.groupby(['location', 'category']).agg(
+    order_count=('order_id', 'count'),
+    user_count=('user_id', 'nunique'),
+    revenue=('amount', 'sum'),
+    avg_amount=('amount', 'mean')
+).reset_index()
+
+# Easier to read:
+
+summary_df = (
+    trips_df
+    .groupby(['city', 'ride_type'])
+    .agg(
+        avg_fare=('fare', 'mean'),
+        trip_count=('trip_id', 'count')
+    )
+).reset_index()
+
+summary_df = summary_df.sort_values(
+    by=['location', 'revenue'],
+    ascending=[True, False]
+)
+
+summary_df
+
 print('##############################################')
 
 print('##############################################')
